@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoMea.Dev | Static Dashboard</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #0b0f19; color: #fff; padding: 40px 20px; display: none; 
+        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #1f2937; padding-bottom: 20px; }
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
+        .dash-card { background: #111827; padding: 25px; border-radius: 8px; border: 1px solid #1f2937; height: fit-content; }
+        .dash-card h3 { margin-top: 0; color: #00ffcc; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #1f2937; font-size: 14px; color: #fff; }
+        th { color: #ff0055; }
+        .dash-card input, .dash-card textarea {
+            width: 100%; padding: 10px; margin-bottom: 15px; background: #1f2937; border: 1px solid #374151; border-radius: 4px; color: #fff; box-sizing: border-box;
+        }
+        .dash-card input:focus, .dash-card textarea:focus { border-color: #00ffcc; outline: none; }
+        
+       
+        .project-management-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        .manage-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: #1f2937; padding: 15px; border-radius: 6px; border: 1px solid #374151; 
+        }
+        .manage-info strong { color: #00ffcc; display: block; font-size: 16px; }
+        .manage-info span { color: #888; font-size: 12px; }
+        .delete-btn { 
+            background: #ff0055; color: white; border: none; padding: 8px 14px; 
+            border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; 
+        }
+        .delete-btn:hover { background: #d00045; }
+        .status-msg { padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dash-header">
+            <h2>Welcome to your Static Dashboard, <span class="neon-text">Momya</span>!</h2>
+            <a href="index.html" class="btn btn-secondary" style="padding: 8px 16px;">Back to Site</a>
+        </div>
+
+        <div class="dash-grid">
+            <div class="dash-card">
+                <h3>🚀 Add New Project</h3>
+                <div id="form-status" class="status-msg"></div>
+                <form id="addProjectForm">
+                    <input type="text" id="proj-title" placeholder="Project Title" required>
+                    <textarea id="proj-desc" rows="4" placeholder="Project Description" required></textarea>
+                    <input type="text" id="proj-tech" placeholder="Tech Stack (e.g. Python, MySQL, HTML)" required>
+                    <input type="url" id="proj-url" placeholder="Project URL (Optional)">
+                    <button type="submit" class="btn">Publish Project</button>
+                </form>
+
+                <div style="margin-top: 40px; border-top: 1px solid #1f2937; padding-top: 20px;">
+                    <h3>🛠️ Manage Current Projects</h3>
+                    <div class="project-management-list" id="dashboard-projects-list">
+                        <p style="color: #888;">Connecting to Firebase database...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <h3>💬 Customer Messages</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-messages-list">
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #888;">Loading messages...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // 🔒 قفل حماية بكلمة سر للـ Static Dashboard
+        const SECRET_PASSWORD = "912103Momea@"; 
+        const userPass = prompt("ادخل الرقم السري لفتح لوحة التحكم يا موميا 🔐:");
+        
+        if (userPass === SECRET_PASSWORD) {
+            document.body.style.display = "block"; 
+        } else {
+            alert("🔒 غير مسموح لك بالدخول!");
+            window.location.href = "index.html"; 
+        }
+
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCojU6w1nL9ogwpCXi46Os5nrWhGafY_L4",
+            authDomain: "momea-9997c.firebaseapp.com",
+            projectId: "momea-9997c",
+            storageBucket: "momea-9997c.firebasestorage.app",
+            messagingSenderId: "364790876623",
+            appId: "1:364790876623:web:cc6fecea62ea4ccca76aba",
+            measurementId: "G-892VNMTF1W"
+        };
+
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        const projectListContainer = document.getElementById('dashboard-projects-list');
+        const messagesListContainer = document.getElementById('dashboard-messages-list');
+        const formStatus = document.getElementById('form-status');
+
+        
+        document.getElementById('addProjectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('proj-title').value;
+            const description = document.getElementById('proj-desc').value;
+            const tech_stack = document.getElementById('proj-tech').value;
+            const project_url = document.getElementById('proj-url').value || 'null';
+
+            formStatus.style.display = 'block';
+            formStatus.style.background = 'rgba(0, 255, 204, 0.1)';
+            formStatus.style.color = '#00ffcc';
+            formStatus.innerText = "Publishing to Firebase...";
+
+            db.collection("projects").add({
+                title: title,
+                description: description,
+                tech_stack: tech_stack,
+                project_url: project_url,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                formStatus.innerText = "🚀 Project published successfully!";
+                document.getElementById('addProjectForm').reset();
+                setTimeout(() => formStatus.style.display = 'none', 3000);
+            })
+            .catch((error) => {
+                formStatus.style.background = 'rgba(255, 0, 85, 0.1)';
+                formStatus.style.color = '#ff0055';
+                formStatus.innerText = "❌ Error: " + error.message;
+            });
+        });
+
+        
+        function listenToProjects() {
+            db.collection("projects").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+                projectListContainer.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    projectListContainer.innerHTML = `<p style="color: #888; font-size: 14px;">No projects found. Add one above!</p>`;
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const project = doc.data();
+                    const projectId = doc.id;
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'manage-item';
+                    itemDiv.innerHTML = `
+                        <div class="manage-info">
+                            <strong>${project.title || 'Untitled'}</strong>
+                            <span>${project.tech_stack || 'No Stack'}</span>
+                        </div>
+                        <button class="delete-btn" onclick="deleteProject('${projectId}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    `;
+                    projectListContainer.appendChild(itemDiv);
+                });
+            }, (error) => {
+                console.error(error);
+            });
+        }
+
+        
+        window.deleteProject = function(projectId) {
+            if (confirm("أنت متأكد إنك عايز تمسح المشروع ده نهائياً؟ 🗑️")) {
+                db.collection("projects").doc(projectId).delete().then(() => {
+                    alert("تم الحذف بنجاح! 👍");
+                }).catch((error) => {
+                    alert("فشل الحذف: " + error.message);
+                });
+            }
+        }
+
+        
+        function listenToMessages() {
+            db.collection("messages").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+                messagesListContainer.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    messagesListContainer.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #888;">No messages yet.</td></tr>`;
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const msg = doc.data();
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${msg.name || 'Anonymous'}</strong></td>
+                        <td>${msg.email || 'No Email'}</td>
+                        <td>${msg.message || 'Empty Message'}</td>
+                    `;
+                    messagesListContainer.appendChild(tr);
+                });
+            }, (error) => {
+                console.error(error);
+            });
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            listenToProjects();
+            listenToMessages();
+        });
+    </script>
+</body>
+</html>

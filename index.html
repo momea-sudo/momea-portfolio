@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoMea.Dev | Full-Stack Developer</title>
+    <link rel="icon" type="image/x-icon" href="static/images/me.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body class="dark-theme"> 
+    <header>
+        <div class="container">
+            <a href="#" class="logo">MoMea<span>.Dev</span></a>
+            <nav>
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#contact">Contact</a>
+                
+                <button id="theme-toggle" class="icon-btn">
+                    <i class="fas fa-sun" id="sun-icon"></i>
+                    <i class="fas fa-moon" id="moon-icon" style="display:none;"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content" data-aos="zoom-in" data-aos-duration="1200">
+            <img src="static/images/me.jpg" alt="MoMea" class="hero-avatar">
+            
+            <h1>Hi, I am <span class="neon-text">MoMea</span></h1>
+            <p>Specializing in <span id="typed-text" class="neon-text" style="text-shadow: none;"></span></p>
+            
+            <div class="hero-buttons">
+                <a href="#projects" class="btn">View My Work</a>
+                <a href="static/cv.pdf" class="btn btn-secondary" download><i class="fas fa-download"></i> Download CV</a>
+            </div>
+
+            <div class="social-links">
+                <a href="https://discord.gg/momea_9121" target="_blank" class="social-icon discord"><i class="fab fa-discord"></i></a>
+                <a href="https://wa.me/+201271332835" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="container section">
+        <h2 data-aos="fade-right">About Me</h2>
+        <div class="about-content" data-aos="fade-up" data-aos-delay="200">
+            <p>I am a <strong>Full-Stack Developer</strong> with a strong focus on building resilient backend architectures and intelligent automation systems. I bridge the gap between clean, scalable server logic and efficient data pipelines.</p>
+            <p>My expertise lies in optimizing database performance, developing customized scripting solutions with Python, and creating seamless web interfaces. I thrive on breaking down complex system requirements into clean, maintainable code that drives actual functionality.</p>
+        </div>
+    </section>
+
+    <section id="skills" class="container section">
+        <h2 data-aos="fade-right">My Tech Stack</h2>
+        <div class="skills-grid">
+            <div class="skill-card" data-aos="flip-left" data-aos-delay="100">Python & Selenium</div>
+            <div class="skill-card" data-aos="flip-left" data-aos-delay="200">C++</div>
+            <div class="skill-card" data-aos="flip-left" data-aos-delay="300">MySQL / MariaDB</div>
+            <div class="skill-card" data-aos="flip-left" data-aos-delay="400">HTML / CSS / JavaScript</div>
+            <div class="skill-card" data-aos="flip-left" data-aos-delay="500">Flask (Backend)</div>
+        </div>
+    </section>
+
+    <section id="projects" class="container section">
+        <h2 data-aos="fade-right">Featured Projects</h2>
+        <div class="projects-grid" id="firebase-projects-grid">
+            <div class="loading-projects">Loading awesome projects...</div>
+        </div>
+    </section>
+
+    <section id="contact" class="container section">
+        <h2 data-aos="fade-right">Get In Touch</h2>
+        <div class="contact-form-wrapper" data-aos="zoom-to-linear" data-aos-duration="800">
+            <form id="contactForm">
+                <input type="text" id="name" placeholder="Your Name" required>
+                <input type="email" id="email" placeholder="Your Email" required>
+                <textarea id="message" rows="5" placeholder="Your Message" required></textarea>
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+            <div id="formResponse"></div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 MoMea.Dev. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script src="static/js/script.js"></script>
+</body>
+</html>
